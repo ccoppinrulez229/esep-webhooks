@@ -23,7 +23,7 @@ public class Function
         dynamic json = JsonConvert.DeserializeObject<dynamic>(input.ToString());
 
         context.Logger.LogInformation($"JSON: {json}");
-        string payload = $"{{'text':'Issue Created: {json.issue.url}'}}";
+        string payload = $"{{'text':'Issue Created: {json.body.issue.url}'}}";
 
         var client = new HttpClient();
         var webRequest = new HttpRequestMessage(HttpMethod.Post, Environment.GetEnvironmentVariable("SLACK_URL"))
