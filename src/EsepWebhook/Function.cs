@@ -22,7 +22,7 @@ public class Function
 
         dynamic json = JsonConvert.DeserializeObject<dynamic>(input.ToString());
 
-        
+        context.Logger.LogInformation($"JSON: {json}");
         string payload = $"{{'text':'Issue Created: {json.issue.url}'}}";
 
         var client = new HttpClient();
