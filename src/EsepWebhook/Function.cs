@@ -1,9 +1,7 @@
 using System.Text;
+using Amazon.Lambda.APIGatewayEvents;
 using Amazon.Lambda.Core;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using System.Net.Http;
-using System.IO;
 
 [assembly: LambdaSerializer(typeof(Amazon.Lambda.Serialization.SystemTextJson.DefaultLambdaJsonSerializer))]
 
@@ -11,34 +9,29 @@ namespace EsepWebhook;
 
 public class Function
 {
-    public string FunctionHandler(object input, ILambdaContext context)
+    public APIGatewayProxyResponse FunctionHandler(APIGatewayProxyRequest input, ILambdaContext context)
     {
-        context.Logger.LogInformation($"FunctionHandler received: {input}");
+        dynamic deserialize = JsonConvert.DeserializeObject(input.Body);
 
-        var json = JObject.Parse(input.ToString()); // outer JSON
-        context.Logger.LogInformation($"Top-level JSON: {json}");
+        string payload = JsonConvert.SerializeObject(new { text = $"Issue Created: {deserialize.issue.html_url}" });
 
-        var bodyContent = json["body"]?.ToString();
-        if (string.IsNullOrEmpty(bodyContent))
-            throw new Exception("Body is null or empty");
+        var client = new HttpClient();
 
-        var bodyJson = JObject.Parse(bodyContent); // inner JSON
+        var environmentVariable = Environment.GetEnvironmentVariable("SLACK_URL");
+        var content = new StringContent(payload, Encoding.UTF8, "application/json");
 
-        var issueUrl = bodyJson["issue"]?["url"]?.ToString() ?? "No URL found";
+        var response = client.PostAsync(
+            environmentVariable,
+            content
+        ).Result;
 
-        context.Logger.LogInformation($"Issue URL: {issueUrl}");
-
-        string payload = JsonConvert.SerializeObject(new { text = $"Issue Created: {issueUrl}" });
-
-        using var client = new HttpClient();
-        var webRequest = new HttpRequestMessage(HttpMethod.Post, Environment.GetEnvironmentVariable("SLACK_URL"))
+        var proxyResponse = new APIGatewayProxyResponse
         {
-            Content = new StringContent(payload, Encoding.UTF8, "application/json")
+            StatusCode = 200,
+            Body = response.Content.ReadAsStringAsync().Result,
+            Headers = new Dictionary<string, string> { { "Content-Type", "application/json" } }
         };
 
-        var response = client.Send(webRequest);
-        using var reader = new StreamReader(response.Content.ReadAsStream());
-
-        return reader.ReadToEnd();
+        return proxyResponse;
     }
 }
