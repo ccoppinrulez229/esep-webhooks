@@ -15,10 +15,18 @@ public class Function
     {
         context.Logger.LogInformation($"FunctionHandler received: {input}");
 
-        var json = JObject.Parse(input.ToString());
-        context.Logger.LogInformation($"JSON: {json}");
+        var json = JObject.Parse(input.ToString()); // outer JSON
+        context.Logger.LogInformation($"Top-level JSON: {json}");
 
-        var issueUrl = json["body"]?["issue"]?["url"]?.ToString() ?? "No URL found";
+        var bodyContent = json["body"]?.ToString();
+        if (string.IsNullOrEmpty(bodyContent))
+            throw new Exception("Body is null or empty");
+
+        var bodyJson = JObject.Parse(bodyContent); // inner JSON
+
+        var issueUrl = bodyJson["issue"]?["url"]?.ToString() ?? "No URL found";
+
+        context.Logger.LogInformation($"Issue URL: {issueUrl}");
 
         string payload = JsonConvert.SerializeObject(new { text = $"Issue Created: {issueUrl}" });
 
