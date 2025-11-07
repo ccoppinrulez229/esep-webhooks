@@ -34,3 +34,4 @@ E:\UF\2025\Fall\CIS4930\Event Driven Architecture\EsepWebhook\esep-webhooks\src\
 E:\UF\2025\Fall\CIS4930\Event Driven Architecture\EsepWebhook\esep-webhooks\src\EsepWebhook\obj\Release\net8.0\linux-x64\EsepWebhook.pdb
 E:\UF\2025\Fall\CIS4930\Event Driven Architecture\EsepWebhook\esep-webhooks\src\EsepWebhook\obj\Release\net8.0\linux-x64\EsepWebhook.genruntimeconfig.cache
 E:\UF\2025\Fall\CIS4930\Event Driven Architecture\EsepWebhook\esep-webhooks\src\EsepWebhook\obj\Release\net8.0\linux-x64\ref\EsepWebhook.dll
+E:\UF\2025\Fall\CIS4930\Event Driven Architecture\EsepWebhook\esep-webhooks\src\EsepWebhook\bin\Release\net8.0\linux-x64\Amazon.Lambda.APIGatewayEvents.dll
